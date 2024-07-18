@@ -9,7 +9,7 @@
   },
   "author": "Zacharias Enochsson",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "jsdom": "^24.1.0",
     "hyperapp": "^2.0.22"
   }
