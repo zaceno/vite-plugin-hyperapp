@@ -1,0 +1,16 @@
+{
+  "name": "vite-plugin-hyperapp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Plugin and helpers for using Hyperapp with Vite",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zacharias Enochsson",
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^24.1.0",
+    "hyperapp": "^2.0.22"
+  }
+}
