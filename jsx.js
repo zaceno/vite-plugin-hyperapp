@@ -8,4 +8,6 @@ export const jsxNode = (tag, props, ...children) =>
     ? tag(props, children)
     : h(tag, props || {}, children.flat().map(nodeify))
 
-export const jsxFragment = (...children) => children.flat().map(nodeify)
+export const jsxFragment = (_, children) => {
+  return children.flat(2).map(nodeify)
+}
