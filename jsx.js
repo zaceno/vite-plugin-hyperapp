@@ -6,7 +6,7 @@ const nodeify = x =>
 export const jsxNode = (tag, props, ...children) =>
   typeof tag === "function"
     ? tag(props, children)
-    : h(tag, props || {}, children.flat().map(nodeify))
+    : h(tag, props || {}, children.flat(2).map(nodeify))
 
 export const jsxFragment = (_, children) => {
   return children.flat(2).map(nodeify)
