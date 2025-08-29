@@ -1,4 +1,5 @@
-# vite-plugin-hyperapp
+
+# Vite Hyperapp Plugin & Starter
 
 Use vite as a dev-server and bundler for your hyperapp projects. Supports:
 
@@ -6,7 +7,7 @@ Use vite as a dev-server and bundler for your hyperapp projects. Supports:
 - Hot module reloading (HMR)
 - Server-side rendering (SSR)
 
-## Quickstart
+## Get Started
 
 To get up and running with Hyperapp and Vite in a few seconds, use [create-vite-hyperapp](https://github.com/zaceno/create-vite-hyperapp):
 
@@ -14,19 +15,21 @@ To get up and running with Hyperapp and Vite in a few seconds, use [create-vite-
 > npm create vite-hyperapp
 ```
 
-This will set you up with all the necessary configuration described below.
+> Use `npm create vite-hyperapp -- --help` for some command line options.
 
-## Config
+The starter will ask you for a folder in which to scaffold the project, and it will also ask if you would like to use typescript and/or SSR.
 
-To manually set up your vite-project for use with Hyperapp, install this plugin:
+
+### Manual setup
+
+In case you want to install manually, you need a project folder with `vite` installed, and a `vite.config.js` ready to go. Then you can install the vite-plugin for hyperapp, and enable it in the config:
 
 ```sh
 > npm install vite-plugin-hyperapp
 ```
 
-And add it to the plugins in your `vite.config.js`:
-
-```
+```js
+// vite.config.js
 import { defineConfig } from "vite"
 import hyperapp from "vite-plugin-hyperapp"
 
@@ -34,23 +37,11 @@ export default defineConfig({
   plugins: [hyperapp()],
 })
 ```
+> Options are passed as an object to `hyperapp({...})`. Available options described below.
 
-You can pass an options object to the plugin, e.g:
+Additionally, if you want typescript/TSX support, please add the following options to `compilerOptions` in your `tsconfig.json`:
 
-```
-  plugins: [hyperapp({
-    optionA: 'foo',
-    optionB: 'bar',
-  })]
-```
-
-...but most of the time you won't need it. See "Hot-module-reloading" below for some options that might be relevant.
-
-## Typescript
-
-To make sure you get proper typing support in your `.tsx` files, make sure to add these compiler options to your `tsconfig.json`:
-
-```
+```json
 /* Necessary for tsx to work with vite-plugin-hyperapp*/
 "jsx": "preserve",
 "jsxImportSource": "vite-plugin-hyperapp"
@@ -58,25 +49,38 @@ To make sure you get proper typing support in your `.tsx` files, make sure to ad
 
 ## Hot-module-reloading (HMR)
 
-For hot-module-reloading to work, the plugin injects some code in the module where you initiate the app. It only works if the module follows these two rules:
+For hot-module-reloading to work, the plugin injects some code in the module where you initiate the app. In order for this to work, the app-initiation module must follow these two rules:
 
-- It must contain:
+1. It must import `app` from `"hyperapp"` using named imports (i.e. with `{..app...}`, not `*`
+2. The dispatch function returned from the app-call must be exported as a _named_ (not default) export.
+
+By default, HMR expects the exported dispatch function to be named `dispatch`. If you choose to name it something else, let the plugin know by providing it to the plugin options: 
 
 ```js
-import {..., app [as something],...} from 'hyperapp'
+//vite.config.js
+export default defineConfig({
+  plugins: [hyperapp({
+    dispatchExport: "myDispatchAlias"
+  })],
+})
 ```
 
-- It must _export_ a _named_ (not default) constant/variable `dispatch`, which should be the function retuned from calling `app({...})`.
+And if you'd rather use Vite's HMR api directly, or forego HMR entirely, you can use set that as an option in the plugin as well:
 
-If you'd rather name the `dispatch` export something else, you can tell the plugin the name you're using as a plugin option: `dispatchExport: "myPreferredName"`
-
-And if you'd rather use Vite's HMR api directly, or forego HMR entirely, you can use the plugin option: `hmr: false`
+```js
+//vite.config.js
+export default defineConfig({
+  plugins: [hyperapp({
+    hmr: false
+  })],
+})
+```
 
 ## Server-side Rendering (SSR)
 
-Generally, in order to set up SSR in your project you can follow Vite's instructions here: [https://vitejs.dev/guide/ssr.html#server-side-rendering](https://vitejs.dev/guide/ssr.html#server-side-rendering)
+Server side rendering with Vite in general is described here: https://vitejs.dev/guide/ssr.html#server-side-rendering Below are some important details specific to Hyperapp and this plugin.
 
-Here are some specifics you'll need to know when using hyperapp and this plugin:
+> When you use `npm create vite-hyperapp` to scaffold a project with SSR, these details are set up for you. But they're useful to be aware of as you build out your app.
 
 ### Redering your initial app to raw html
 
@@ -94,7 +98,7 @@ export async function render() {
 
 `renderApp` is an async function that takes the same options object as `hyperapp.app` - except the `node` option - and returns a promise which resolves to the html-string.
 
-Note: it is important that the server-entry module has `import ... from 'vite-plugin-hyperapp/ssr'` somewhere in it, in order for HMR to continue working on SSR enabled apps.
+> It is important that the server-entry module has `import ... from 'vite-plugin-hyperapp/ssr'` somewhere in it, in order for HMR to continue working on SSR enabled apps.
 
 ### Mountpoint defined by the view
 
@@ -136,3 +140,4 @@ Then you _DON'T_ add your ssr outlet like this:
 ```
 
 And you make sure that the root-node of your view has `id="app"`.
+
