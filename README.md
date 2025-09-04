@@ -55,36 +55,6 @@ add this line in your `src/vite-env.d.ts`:
 /// <reference types="vite-plugin-hyperapp/jsx" />
 ```
 
-## JSX/TSX 
-
-Our JSX/TSX works the same as React/Preact, however, note that when you pass children to a component, like:
-
-```jsx
-<MyComponent>
-  <p>foo</p>
-  <p>bar</p>
-</MyComponent>
-```
-
-they will arrive as an array of virtual nodes in the _second_ argument to the component.
-
-```jsx
-const MyComponent = (props, children) => {
-  //children will be: [<p>foo</p>, <p>bar</p>]
-}
-```
-
-It's ok to put this array of children among other children, because the jsx transform will flatten the child-list:
-
-```jsx
-const MyComponent = (props, children) => (
-  <div>
-    <h1>Header</h1>
-    {children} {/* <--- this is fine */}
-  </div>
-)
-```
-
 ## Hot-module-reloading (HMR)
 
 > The following is taken care of already, when you scaffold your app with `npm create vite-hyperapp`, but it is useful to be aware of
@@ -180,4 +150,52 @@ Then you _DON'T_ add your ssr outlet like this:
 ```
 
 And you make sure that the root-node of your view has `id="app"`.
+
+
+## Important Notes
+
+### Main view with TSX
+
+TSX-expressions necessarily return the hyperapp type `MaybeVNode<State> | MaybeVNode<State>[]`. However, that is too loose for the `view` you pass to hyperapp's `app({...})` call. Therefore, you need to cast the return of your main view to `VNode<State>` (and of course make sure this is true, also).
+
+```ts
+import {type VNode} from 'hyperapp'
+...
+
+export const view = (state:State) => (
+  <main id="app">
+    ...
+  </main>
+) as VNode<State>
+```
+
+### JSX/TSX children
+
+When you pass children to a component, like:
+
+```jsx
+<MyComponent>
+  <p>foo</p>
+  <p>bar</p>
+</MyComponent>
+```
+
+they will arrive as an array of virtual nodes in the _second_ argument to the component.
+
+```jsx
+const MyComponent = (props, children) => {
+  //children will be: [<p>foo</p>, <p>bar</p>]
+}
+```
+
+It's ok to put this array of children among other children, because the jsx transform will flatten the child-list:
+
+```jsx
+const MyComponent = (props, children) => (
+  <div>
+    <h1>Header</h1>
+    {children} {/* <--- this is fine */}
+  </div>
+)
+```
 
