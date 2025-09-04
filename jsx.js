@@ -1,13 +1,13 @@
 import { h, text } from "hyperapp"
 
-const nodeify = x =>
-  (typeof x === "string") | (typeof x === "number") ? text(x) : x
+const cproc = children =>
+  children
+    .flat()
+    .map(x => ((typeof x === "string") | (typeof x === "number") ? text(x) : x))
 
-export const jsxNode = (tag, props, ...children) =>
+export const jsx = (tag, props, ...children) =>
   typeof tag === "function"
-    ? tag(props, children)
-    : h(tag, props || {}, children.flat(2).map(nodeify))
+    ? tag(props, cproc(children))
+    : h(tag, props || {}, cproc(children))
 
-export const jsxFragment = (_, children) => {
-  return children.flat(2).map(nodeify)
-}
+export const jsxFragment = (_, children) => cproc(children)

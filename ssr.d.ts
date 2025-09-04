@@ -2,7 +2,7 @@ import { Subscription } from "hyperapp"
 
 type Defs<S = any> = {
   init?: Dispatchable<S>
-  view?: (state: S) => ElementVNode<S>
+  view?: (state: S) => VNode<S>
   subscriptions?: (state: S) => Subscription<S>[]
   dispatch?: (d: Dispatch<S>) => Dispatch<S>
 }

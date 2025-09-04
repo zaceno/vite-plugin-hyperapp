@@ -3,14 +3,49 @@
   "version": "1.1.2",
   "type": "module",
   "description": "Plugin and helpers for using Hyperapp with Vite",
-  "main": "index.js",
+  "main": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Zacharias Enochsson",
   "license": "MIT",
+  "files": [
+    "*.js",
+    "*.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "default": "./index.js"
+    },
+    "./jsx": {
+      "types": "./jsx.d.ts",
+      "import": "./jsx.js",
+      "default": "./jsx.js"
+    },
+    "./jsx.js": {
+      "types": "./jsx.d.ts",
+      "import": "./jsx.js",
+      "default": "./jsx.js"
+    },
+    "./ssr": {
+      "types": "./ssr.d.ts",
+      "import": "./ssr.js",
+      "default": "./ssr.js"
+    },
+    "./ssr.js": {
+      "types": "./ssr.d.ts",
+      "import": "./ssr.js",
+      "default": "./ssr.js"
+    },
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "jsdom": "^24.1.0",
     "hyperapp": "^2.0.22"
+  },
+  "peerDependencies": {
+    "vite": "^4.5.14"
   }
 }

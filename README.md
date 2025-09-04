@@ -39,15 +39,55 @@ export default defineConfig({
 ```
 > Options are passed as an object to `hyperapp({...})`. Available options described below.
 
-Additionally, if you want typescript/TSX support, please add the following options to `compilerOptions` in your `tsconfig.json`:
+In order to enable build TSX files to build, please add the following options to `compilerOptions` in your `tsconfig.json`:
 
 ```json
-/* Necessary for tsx to work with vite-plugin-hyperapp*/
+/* Necessary for tsx to work with vite-plugin-hyperapp */
 "jsx": "preserve",
-"jsxImportSource": "vite-plugin-hyperapp"
+"jsxFactory": "jsx",
+"jsxFragmentFactory": "jsxFragment"
+```
+
+and to make sure your editor's TS language server picks up the right types for JSX/TSX,
+add this line in your `src/vite-env.d.ts`:
+
+```
+/// <reference types="vite-plugin-hyperapp/jsx" />
+```
+
+## JSX/TSX 
+
+Our JSX/TSX works the same as React/Preact, however, note that when you pass children to a component, like:
+
+```jsx
+<MyComponent>
+  <p>foo</p>
+  <p>bar</p>
+</MyComponent>
+```
+
+they will arrive as an array of virtual nodes in the _second_ argument to the component.
+
+```jsx
+const MyComponent = (props, children) => {
+  //children will be: [<p>foo</p>, <p>bar</p>]
+}
+```
+
+It's ok to put this array of children among other children, because the jsx transform will flatten the child-list:
+
+```jsx
+const MyComponent = (props, children) => (
+  <div>
+    <h1>Header</h1>
+    {children} {/* <--- this is fine */}
+  </div>
+)
 ```
 
 ## Hot-module-reloading (HMR)
+
+> The following is taken care of already, when you scaffold your app with `npm create vite-hyperapp`, but it is useful to be aware of
 
 For hot-module-reloading to work, the plugin injects some code in the module where you initiate the app. In order for this to work, the app-initiation module must follow these two rules:
 
