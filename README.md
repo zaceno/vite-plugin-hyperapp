@@ -12,7 +12,7 @@ Use vite as a dev-server and bundler for your hyperapp projects. Supports:
 To get up and running with Hyperapp and Vite in a few seconds, use [create-vite-hyperapp](https://github.com/zaceno/create-vite-hyperapp):
 
 ```sh
-> npm create vite-hyperapp
+> npm create vite-hyperapp@latest
 ```
 
 > Use `npm create vite-hyperapp -- --help` for some command line options.

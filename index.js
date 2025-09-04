@@ -32,10 +32,10 @@ export default function injectConsoleLog(options = {}) {
 
     config: () => ({
       esbuild: {
-        jsxFactory: "jsxNode",
+        jsxFactory: "jsx",
         jsxFragment: "jsxFragment",
         jsxInject:
-          "import {jsxNode, jsxFragment} from 'vite-plugin-hyperapp/jsx.js'",
+          "import {jsx, jsxFragment} from 'vite-plugin-hyperapp/jsx.js'",
       },
     }),
 
