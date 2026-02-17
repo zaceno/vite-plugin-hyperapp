@@ -46,6 +46,6 @@
     "hyperapp": "^2.0.22"
   },
   "peerDependencies": {
-    "vite": "^4.5.14"
+    "vite": "^7.1.2"
   }
 }
