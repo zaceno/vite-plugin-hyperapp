@@ -1,84 +1,173 @@
+# Vite Hyperapp Plugin
 
-# Vite Hyperapp Plugin & Starter
+Use Vite 8 to develop and build Hyperapp apps, with support for JSX/TSX, HMR and SSR.
 
-Use vite as a dev-server and bundler for your hyperapp projects. Supports:
+## Get started
 
-- Views in JSX/TSX
-- Hot module reloading (HMR)
-- Server-side rendering (SSR)
-
-## Get Started
-
-To get up and running with Hyperapp and Vite in a few seconds, use [create-vite-hyperapp](https://github.com/zaceno/create-vite-hyperapp):
+In a Vite project, install `hyperapp` as a dependency and `vite-plugin-hyperapp` as a development-dependency: 
 
 ```sh
-> npm create vite-hyperapp@latest
+npm install hyperapp
+npm install -D vite vite-plugin-hyperapp
 ```
 
-> Use `npm create vite-hyperapp -- --help` for some command line options.
+> If you intend to use SSR, you will want to install `vite-plugin-hyperapp` as a regular dependency since the server needs to `import {renderToString} from 'vite-plugin-hyperapp/ssr'`
 
-The starter will ask you for a folder in which to scaffold the project, and it will also ask if you would like to use typescript and/or SSR.
-
-
-### Manual setup
-
-In case you want to install manually, you need a project folder with `vite` installed, and a `vite.config.js` ready to go. Then you can install the vite-plugin for hyperapp, and enable it in the config:
-
-```sh
-> npm install vite-plugin-hyperapp
-```
+Add the plugin to your Vite config:
 
 ```js
 // vite.config.js
-import { defineConfig } from "vite"
-import hyperapp from "vite-plugin-hyperapp"
+import { defineConfig } from 'vite'
+import { hyperapp } from 'vite-plugin-hyperapp'
 
 export default defineConfig({
   plugins: [hyperapp()],
 })
 ```
-> Options are passed as an object to `hyperapp({...})`. Available options described below.
 
-In order to enable build TSX files to build, please add the following options to `compilerOptions` in your `tsconfig.json`:
+Here is a small app to try it with:
 
-```json
-/* Necessary for tsx to work with vite-plugin-hyperapp */
-"jsx": "preserve",
-"jsxFactory": "jsx",
-"jsxFragmentFactory": "jsxFragment"
+```html
+<!-- index.html -->
+<main id="app"></main>
+<script type="module" src="/src/main.jsx"></script>
 ```
 
-and to make sure your editor's TS language server picks up the right types for JSX/TSX,
-add this line in your `src/vite-env.d.ts`:
+```jsx
+// src/main.jsx
+import { app } from 'hyperapp'
 
-```
-/// <reference types="vite-plugin-hyperapp/jsx" />
-```
+const Increment = (state) => ({ count: state.count + 1 })
 
-## Hot-module-reloading (HMR)
+const view = (state) => (
+  <main id="app">
+    <button onclick={Increment}>Count: {state.count}</button>
+  </main>
+)
 
-> The following is taken care of already, when you scaffold your app with `npm create vite-hyperapp`, but it is useful to be aware of
+const node = document.getElementById('app')
+if (!node) throw new Error('Mount node not found')
 
-For hot-module-reloading to work, the plugin injects some code in the module where you initiate the app. In order for this to work, the app-initiation module must follow these two rules:
-
-1. It must import `app` from `"hyperapp"` using named imports (i.e. with `{..app...}`, not `*`
-2. The dispatch function returned from the app-call must be exported as a _named_ (not default) export.
-
-By default, HMR expects the exported dispatch function to be named `dispatch`. If you choose to name it something else, let the plugin know by providing it to the plugin options: 
-
-```js
-//vite.config.js
-export default defineConfig({
-  plugins: [hyperapp({
-    dispatchExport: "myDispatchAlias"
-  })],
+app({
+  init: { count: 0 },
+  view,
+  node,
 })
 ```
 
-And if you'd rather use Vite's HMR api directly, or forego HMR entirely, you can use set that as an option in the plugin as well:
+## Views in JSX or TSX
+
+You are free to use hyperapp's built-in `h()` and `text()`, or `@hyperapp/html` or any other view authoring system you prefer. 
+
+But if you want to use JSX, you can do so with no extra config. Just make sure to name every file where you use JSX with the extension `.jsx` (or `.tsx` if you are using Typescript).
+
+### Component children
+
+Unlike the old standard, the JSX support of this plugin now follows the modern convention of putting `children` as a property of components, rather than a second argument.
+
+```jsx
+function Panel({ title, children }) {
+  return (
+    <section>
+      <h2>{title}</h2>
+      {children}
+    </section>
+  )
+}
+
+const view = (state) => (
+  <main id="app">
+    <Panel title="Welcome"><p>{state.message}</p></Panel>
+  </main>
+)
+```
+### Fragments
+
+The JSX support comes with support for fragments (`<>...</>`) - allowing components to return an array of nodes.
+
+```jsx
+
+function Items({items}) {
+  return (
+    <>
+    {items.map(txt => <li>{txt}</li>)}
+    </>
+  )
+}
+
+function List({items}) {
+  return (
+    <ul>
+      <li>Always First</li>
+      <Items items={items} />
+      <li>Always Last</li>
+    </ul>
+  )
+}
+
+<List items={['a', 'b', 'c']} />
+/* ==>
+  <ul>
+    <li>Always First</li>
+    <li>a</li>
+    <li>b</li>
+    <li>c</li>
+    <li>Always Last</li>
+  </ul>
+*/
+```
+
+> Note: Hyperapp requires the top node of the view to ***not*** be a fragment.
+
+### Using TypeScript (TSX)
+
+If you use TypeScript, use the file extension `.tsx` rather than `.jsx`.
+
+You will also need to configure TypeScript to recognize the JSX runtime in your `tsconfig.json`, by adding the following to your `compilerOptions`:
+
+```jsonc
+// tsconfig.json
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "vite-plugin-hyperapp/jsx"
+  }
+}
+```
+
+For components that accept children, type the children as `Child` – a convenience type exported from the runtime:
+
+```tsx
+import type { Child } from 'vite-plugin-hyperapp/jsx/jsx-runtime'
+
+function Panel({ title, children }: { title: string; children?: Child }) {
+  return (
+    <section>
+      <h2>{title}</h2>
+      {children}
+    </section>
+  )
+}
+```
+
+## Hot module reloading
+
+Hot Module Reloading is on by default in the dev server, when using this plugin. It means that any changes to your app will be reloaded *without clearing the state*. That lets you navigate to a particular view and develop it with live updates – and because the state does not change, you don't have to navigate back to the view to see your changes – you are already there!
+
+For HMR to work, some simple rules need to be observed:
+
+- In your main client side entry, import `app` from `hyperapp` *without renaming it* – e.g. do *not* `import  {app as hyperApp} ...`
+- Use an id to identify the app mountpoint in the html entrypoint, and make sure to use the exact same tag ***and id*** for the top vnode of your view.
+- Any kind of logic you put outside of `app()` risks being rerun every HMR so keep your app logic contained to the properties you pass to app (`init`, `subscriptions`, `dispatch`).
+
+If HMR is giving you grief, simply disable it by setting the `hmr` option to `false` in the plugin options: 
+
 
 ```js
-//vite.config.js
+// vite.config.js
+import { defineConfig } from 'vite'
+import { hyperapp } from 'vite-plugin-hyperapp'
+
 export default defineConfig({
   plugins: [hyperapp({
     hmr: false
@@ -86,116 +175,179 @@ export default defineConfig({
 })
 ```
 
-## Server-side Rendering (SSR)
 
-Server side rendering with Vite in general is described here: https://vitejs.dev/guide/ssr.html#server-side-rendering Below are some important details specific to Hyperapp and this plugin.
+## Server-side rendering
 
-> When you use `npm create vite-hyperapp` to scaffold a project with SSR, these details are set up for you. But they're useful to be aware of as you build out your app.
+Server-side rendering is when the server sends your app's initial view already fully rendered as HTML. Since Hyperapp recycles existing nodes (as long as they match the initial view), your initial view will be rendered even while your app is still loading, improving perceived performance.
 
-### Redering your initial app to raw html
+See [Vite's SSR guide](https://vite.dev/guide/ssr) for setting up a server and
+client entry. 
 
-This plugin provides a function exported from `vite-plugin-hyperapp/ssr`, which can render your initial app as static html.
-
-For example:
-
-```js
-import { init, view } from "./main"
-import renderApp from "vite-plugin-hyperapp/ssr"
-export async function render() {
-  return await renderApp({ init, view })
-}
-```
-
-`renderApp` is an async function that takes the same options object as `hyperapp.app` - except the `node` option - and returns a promise which resolves to the html-string.
-
-> It is important that the server-entry module has `import ... from 'vite-plugin-hyperapp/ssr'` somewhere in it, in order for HMR to continue working on SSR enabled apps.
-
-### Mountpoint defined by the view
-
-Unlike many other framework, Hyperapp _replaces_ the given mount-node with the root node rended from the view.
-
-This means that if your non-ssr `index.html` has this:
-
-```html
-<p>Static html here</p>
-<div id="app"></div>
-<p>More static html</p>
-```
-
-and you start your app like this:
+This plugin exports `renderToString` from
+`vite-plugin-hyperapp/ssr`. Import it in your server entry to render the
+initial view to an HTML string:
 
 ```js
-app({
-  ...,
-  node: document.querySelector('#app')
+// src/entry-server.js
+import { renderToString } from 'vite-plugin-hyperapp/ssr'
+import { init, view } from './app.jsx'
+
+//...
+
+let html = readFileSync('./index.html.template', 'utf-8')
+html = html.replace(
+  '<!--ssr-outlet-->,
+  () => renderToString({init, view })
+) 
+
+//... respond with html
+
+```
+
+### How to avoid calling browser APIs server-side
+
+Since you pass the same `init` to your server rendering as you pass to your client side app (in order to get the same initial view), there is a danger if your init runs effects that depend on browser-only APIs. 
+
+To avoid this, use the `import.meta.env.SSR` environment variable in your init action, to opt out of browser-only effects when in SSR:
+
+```js
+// src/app.jsx
+const focusInput = () => document.querySelector('#new-item')?.focus()
+
+export const init = () => [
+  {items: []},
+  !import.meta.env.SSR && focusInput //effect won't run in SSR
+]
+```
+
+> Note: this only matters for the init action. renderToString does not run subscriptions, nor other actions - unless an init effect dispatches them.
+
+
+### Initializing your app with data
+
+A common requirement is to initialize one's app with some preloaded data. Let's say, for example, you have a shopping cart and want to start the app with the cart items for the logged in user. 
+
+```js
+//src/entry-server.js
+
+// check auth header and get the logged in user
+const user = await auth.checkLogin()
+
+// get the users existing cart items:
+const cartItems = await db.getCartItemsForUser(user)
+
+// ... now, how do we send this data, along with the app
+// to the client?
+
+```
+
+In order to ensure that the server and client both produce the same initial DOM structure, we must ensure they are initialized the same way with the same data. Here is a simple pattern for that:
+
+
+#### Step 1 – Make the init action accept initialization data.
+
+```js
+//app.jsx
+export const init = (
+  _,
+  {user, cartItems}={user:null, cartItems:[]}
+) => ({
+  //...a bunch of other initial state,
+  cartItems, user
 })
 ```
 
-Then you _DON'T_ add your ssr outlet like this:
+#### Step 2 - Pass the data as payload to init on the server
 
-```html
-<p>Static html here</p>
-<div id="app">
-  <!--ssr-outlet-->
-</div>
-<p>More static html</p>
+```js
+// src/entry-server.js
+// ...
+
+let html = readFileSync('./index.html.template', 'utf-8')
+
+html = html.replace(
+  '<!--ssr-outlet-->',
+  () => renderToString({init: [init, {user, cartItems}], view })
+) 
 ```
 
-...but rather like this:
+#### Step 3 - Serialize the data into the html response
 
-```html
-<p>Static html here</p>
-<!--ssr-outlet-->
-<p>More static html</p>
-```
+This way the same data will be available in the client when the app starts up. 
 
-And you make sure that the root-node of your view has `id="app"`.
+```js
+// src/entry-server.js
 
+//...
 
-## Important Notes
+//html-safe json serialization
+const json = JSON
+  .stringify({user, cartItems})
+  .replace(
+    /[<>&\u2028\u2029]/g,
+    character => ({
+      '<': '\\u003c',
+      '>': '\\u003e',
+      '&': '\\u0026',
+      '\u2028': '\\u2028',
+      '\u2029': '\\u2029',
+    })[character]
+  )
 
-### Main view with TSX
-
-TSX-expressions necessarily return the hyperapp type `MaybeVNode<State> | MaybeVNode<State>[]`. However, that is too loose for the `view` you pass to hyperapp's `app({...})` call. Therefore, you need to cast the return of your main view to `VNode<State>` (and of course make sure this is true, also).
-
-```ts
-import {type VNode} from 'hyperapp'
-...
-
-export const view = (state:State) => (
-  <main id="app">
-    ...
-  </main>
-) as VNode<State>
-```
-
-### JSX/TSX children
-
-When you pass children to a component, like:
-
-```jsx
-<MyComponent>
-  <p>foo</p>
-  <p>bar</p>
-</MyComponent>
-```
-
-they will arrive as an array of virtual nodes in the _second_ argument to the component.
-
-```jsx
-const MyComponent = (props, children) => {
-  //children will be: [<p>foo</p>, <p>bar</p>]
-}
-```
-
-It's ok to put this array of children among other children, because the jsx transform will flatten the child-list:
-
-```jsx
-const MyComponent = (props, children) => (
-  <div>
-    <h1>Header</h1>
-    {children} {/* <--- this is fine */}
-  </div>
+html = html.replace(
+  '<!--initial-data-->',
+  () => `<script>window.initialData=${json};</script>`
 )
 ```
 
+(The HTML template might look like this)
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+  </head>
+  <body>
+    <!--initial-data-->
+    <!--ssr-outlet-->
+    <script type="module" src="/src/entry-client.js"></script>
+  </body>
+</html>
+
+```
+
+
+#### Step 4 - Use the initial data in client app init
+
+Wherever you start up your app in the client (in this example `entry-client.js`), pass along the data embedded in the page.
+
+```js
+// src/entry-client.js
+import {app} from 'hyperapp'
+import {init, view} from './app.jsx'
+app({
+  init: [init, window.initialData],
+  view,
+  node: document.getElementById('app')
+})
+
+```
+
+## Safari TSX source maps
+
+If Safari Web Inspector doesn't show your original TSX under the transformed
+module, enable the optional development workaround:
+
+```js
+// vite.config.js
+export default defineConfig({
+  plugins: [hyperapp({ safariExternalSourcemaps: true })],
+})
+```
+
+It makes Safari load Vite's external `.tsx.map` rather than an inline map.
+Safari shows the generated JS as the parent source and the original TSX below
+it. Chrome and production output are unchanged. This option is off by default;
+ordinary `.ts` files don't need it.

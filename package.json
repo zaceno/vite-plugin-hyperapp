@@ -1,51 +1,46 @@
 {
   "name": "vite-plugin-hyperapp",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "Plugin and helpers for using Hyperapp with Vite",
-  "main": "./index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Zacharias Enochsson",
   "license": "MIT",
-  "files": [
-    "*.js",
-    "*.d.ts"
-  ],
   "exports": {
     ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "default": "./index.js"
-    },
-    "./jsx": {
-      "types": "./jsx.d.ts",
-      "import": "./jsx.js",
-      "default": "./jsx.js"
-    },
-    "./jsx.js": {
-      "types": "./jsx.d.ts",
-      "import": "./jsx.js",
-      "default": "./jsx.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
     "./ssr": {
-      "types": "./ssr.d.ts",
-      "import": "./ssr.js",
-      "default": "./ssr.js"
+      "types": "./dist/ssr/index.d.ts",
+      "import": "./dist/ssr/index.js"
     },
-    "./ssr.js": {
-      "types": "./ssr.d.ts",
-      "import": "./ssr.js",
-      "default": "./ssr.js"
+    "./jsx/jsx-runtime": {
+      "types": "./dist/jsx/jsx-runtime.d.ts",
+      "import": "./dist/jsx/jsx-runtime.js"
+    },
+    "./jsx/jsx-dev-runtime": {
+      "types": "./dist/jsx/jsx-dev-runtime.d.ts",
+      "import": "./dist/jsx/jsx-dev-runtime.js"
     },
     "./package.json": "./package.json"
   },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "npm run build && vitest run"
+  },
   "dependencies": {
-    "jsdom": "^24.1.0",
-    "hyperapp": "^2.0.22"
+    "magic-string": "^1.4.3"
   },
   "peerDependencies": {
-    "vite": "^7.1.2"
+    "hyperapp": "^2.0.22",
+    "vite": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "hyperapp": "^2.0.22",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.3"
   }
 }
