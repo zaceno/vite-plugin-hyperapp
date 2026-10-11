@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'vitest'
 import { createServer } from 'vite'
 import { fileURLToPath } from 'node:url'
-import { hyperapp } from '../../dist/index.js'
+import hyperapp from '../../dist/index.js'
 
 test('Safari can request the external TSX map; Chrome still gets the inline map', async () => {
   const server = await createServer({

@@ -14,3 +14,5 @@ export function hyperapp(options: HyperappOptions = {}): Plugin[] {
   if (options.safariExternalSourcemaps) plugins.push(safariExternalSourcemapsPlugin())
   return plugins
 }
+
+export default hyperapp

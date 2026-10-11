@@ -18,7 +18,7 @@ Add the plugin to your Vite config:
 ```js
 // vite.config.js
 import { defineConfig } from 'vite'
-import { hyperapp } from 'vite-plugin-hyperapp'
+import hyperapp from 'vite-plugin-hyperapp'
 
 export default defineConfig({
   plugins: [hyperapp()],
@@ -166,7 +166,7 @@ If HMR is giving you grief, simply disable it by setting the `hmr` option to `fa
 ```js
 // vite.config.js
 import { defineConfig } from 'vite'
-import { hyperapp } from 'vite-plugin-hyperapp'
+import hyperapp from 'vite-plugin-hyperapp'
 
 export default defineConfig({
   plugins: [hyperapp({

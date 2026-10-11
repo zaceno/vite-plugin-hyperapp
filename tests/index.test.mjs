@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'vitest'
-import { hyperapp } from '../dist/index.js'
+import hyperapp from '../dist/index.js'
 import { createFixtureServer } from './test-helpers.mjs'
 
 test('the entry point composes defaults and optional features', async () => {
