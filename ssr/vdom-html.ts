@@ -92,7 +92,9 @@ function render(node: VNode<any> | boolean | null | undefined, isSvg: boolean): 
   if (!svg && voidElements.has(tag)) return `<${tag}${attributes}>`
 
   let children: string
-  if (tag === 'textarea' && !svg && (props.value != null || props.defaultValue != null)) {
+  if (Object.hasOwn(props, 'innerHTML')) {
+    children = String(props.innerHTML ?? '')
+  } else if (tag === 'textarea' && !svg && (props.value != null || props.defaultValue != null)) {
     children = escapeHtml(props.value ?? props.defaultValue)
   } else if ((tag === 'script' || tag === 'style') && !svg) {
     // Raw-text HTML elements do not decode character references. A closing

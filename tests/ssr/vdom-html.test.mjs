@@ -17,10 +17,17 @@ test('class arrays and objects are normalized by Hyperapp h()', () => {
 test('event handlers, DOM-only properties, and unrepresentable values are omitted', () => {
   const node = h('button', {
     onclick: () => {}, oninput: [() => {}, {}], key: 'ignored',
-    scrollTop: 5, innerHTML: '<b>no</b>', customObject: { a: 1 },
+    scrollTop: 5, customObject: { a: 1 },
     id: 'submit', disabled: true, title: null,
   }, [text('Save')])
   assert.equal(vdomToHtml(node), '<button id="submit" disabled>Save</button>')
+})
+
+test('innerHTML renders raw markup instead of vnode children, never as an attribute', () => {
+  const node = h('astro-slot', { innerHTML: '<strong>A &amp; B</strong>' }, [text('ignored')])
+  assert.equal(vdomToHtml(node), '<astro-slot><strong>A &amp; B</strong></astro-slot>')
+  assert.equal(vdomToHtml(h('div', { innerHTML: '' }, [text('ignored')])), '<div></div>')
+  assert.equal(vdomToHtml(h('div', { innerHTML: null }, [text('ignored')])), '<div></div>')
 })
 
 test('HTML boolean, enumerated boolean, overloaded boolean, and data attributes', () => {
