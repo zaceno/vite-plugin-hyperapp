@@ -150,6 +150,26 @@ function Panel({ title, children }: { title: string; children?: Child }) {
 }
 ```
 
+### Using JSX alongside another framework
+
+By default, with no JSX filters, this plugin sets Hyperapp's JSX runtime for the whole Vite project. If another framework also uses `.jsx` or `.tsx` files, put each framework's components in separate folders and select Hyperapp files with `jsx.include` and/or `jsx.exclude`:
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import hyperapp from 'vite-plugin-hyperapp'
+
+export default defineConfig({
+  plugins: [
+    react({ include: ['**/src/react/**/*.{jsx,tsx}'] }),
+    hyperapp({ jsx: { include: ['**/src/hyperapp/**/*.{jsx,tsx}'] } }),
+  ],
+})
+```
+
+When either JSX filter is set, only matching `.jsx`/`.tsx` files get Hyperapp's JSX import source; other files continue to use the project's normal JSX configuration (React in the example). `include` selects eligible files, `exclude` removes files from that selection, and `exclude` wins when both match. If only `exclude` is set, all `.jsx`/`.tsx` files except those excluded use Hyperapp. Explicit `@jsxImportSource` comments in source files take precedence. Filters affect JSX runtime selection only, not Vite's other JavaScript/TypeScript transforms or this plugin's HMR feature.
+
 ## Hot module reloading
 
 Hot Module Reloading is on by default in the dev server, when using this plugin. It means that any changes to your app will be reloaded *without clearing the state*. That lets you navigate to a particular view and develop it with live updates – and because the state does not change, you don't have to navigate back to the view to see your changes – you are already there!
