@@ -37,7 +37,9 @@ export function jsx(
   key?: string,
 ): JSX.Element {
   const attributes = props ?? {}
-  if (typeof tag === 'function') return tag(attributes) as JSX.Element
+  if (typeof tag === 'function') {
+    return tag(key === undefined ? attributes : { ...attributes, key }) as JSX.Element
+  }
   const { children, ...rest } = attributes
   return h(tag, key === undefined ? rest : { ...rest, key }, normalize(children))
 }

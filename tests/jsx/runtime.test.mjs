@@ -47,6 +47,18 @@ test('components get children in props, and fragments flatten in elements', () =
   assert.deepEqual(node.children.map(child => child.tag), ['strong', 'one', 'em'])
 })
 
+test('components receive the key as a prop', () => {
+  let received
+  const Component = props => {
+    received = props
+    return jsx('strong', {})
+  }
+
+  jsx(Component, { title: 'demo' }, 'component-key')
+
+  assert.deepEqual(received, { title: 'demo', key: 'component-key' })
+})
+
 test('Vite transforms TSX and supplies a map back to the source file', async () => {
   const result = await server.transformRequest('/fixtures/view.tsx')
   assert.ok(result)
