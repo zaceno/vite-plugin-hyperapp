@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-hyperapp",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "type": "module",
   "description": "Plugin and helpers for using Hyperapp with Vite",
   "author": "Zacharias Enochsson",
