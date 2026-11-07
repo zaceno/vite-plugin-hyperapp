@@ -1,4 +1,1 @@
-export { Fragment, jsx, jsxs, type JSX } from './jsx-runtime.ts'
-import { jsx } from './jsx-runtime.ts'
-
-export const jsxDEV = jsx
+export { Fragment, jsx, jsxs, jsxDEV, type Child, type JSX } from 'hyperapp-jsx/jsx-dev-runtime'

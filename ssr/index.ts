@@ -1,1 +1,1 @@
-export { renderToString } from './render-to-string.ts'
+export { renderToString, vdomToHtml, type ServerAppProps } from 'hyperapp-ssr'

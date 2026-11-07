@@ -7,12 +7,12 @@ test('the entry point composes defaults and optional features', async () => {
   const server = await createFixtureServer()
   try {
     assert.deepEqual(hyperapp().map(plugin => plugin.name), [
-      'local:hyperapp-jsx',
+      'hyperapp-jsx',
       'local:hyperapp-hmr',
     ])
     assert.deepEqual(
       hyperapp({ hmr: false, safariExternalSourcemaps: true }).map(plugin => plugin.name),
-      ['local:hyperapp-jsx', 'local:safari-external-sourcemaps'],
+      ['hyperapp-jsx', 'local:safari-external-sourcemaps'],
     )
 
     const noHmr = await createFixtureServer({ hmr: false })

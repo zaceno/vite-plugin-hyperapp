@@ -1,5 +1,5 @@
 import type { FilterPattern, Plugin } from 'vite'
-import { hyperappJsx } from './jsx/vite.ts'
+import { hyperappJsx } from 'hyperapp-jsx/vite'
 import { hyperappHmr } from './hmr/vite.ts'
 import { safariExternalSourcemapsPlugin } from './safari-sourcemaps/vite.ts'
 

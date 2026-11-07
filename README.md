@@ -2,6 +2,8 @@
 
 Use Vite 8 to develop and build Hyperapp apps, with support for JSX/TSX, HMR and SSR.
 
+JSX/TSX support lives in [`hyperapp-jsx`](https://github.com/zaceno/hyperapp-jsx) and server-side rendering lives in [`hyperapp-ssr`](https://github.com/zaceno/hyperapp-ssr). This plugin depends on both and keeps the old `vite-plugin-hyperapp/jsx` and `vite-plugin-hyperapp/ssr` subpaths as compatibility aliases.
+
 ## Get started
 
 In a Vite project, install `hyperapp` as a dependency and `vite-plugin-hyperapp` as a development-dependency: 
@@ -11,7 +13,13 @@ npm install hyperapp
 npm install -D vite vite-plugin-hyperapp
 ```
 
-> If you intend to use SSR, you will want to install `vite-plugin-hyperapp` as a regular dependency since the server needs to `import {renderToString} from 'vite-plugin-hyperapp/ssr'`
+If you write views in JSX/TSX, install `hyperapp-jsx` directly so your source files can resolve the runtime and types:
+
+```sh
+npm install -D hyperapp-jsx
+```
+
+> If you intend to use SSR, install `hyperapp-ssr` as a regular dependency since the server needs to `import {renderToString} from 'hyperapp-ssr'`. The old `vite-plugin-hyperapp/ssr` import still works for compatibility.
 
 Add the plugin to your Vite config:
 
@@ -130,7 +138,7 @@ You will also need to configure TypeScript to recognize the JSX runtime in your 
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "vite-plugin-hyperapp/jsx"
+    "jsxImportSource": "hyperapp-jsx"
   }
 }
 ```
@@ -138,7 +146,7 @@ You will also need to configure TypeScript to recognize the JSX runtime in your 
 For components that accept children, type the children as `Child` – a convenience type exported from the runtime:
 
 ```tsx
-import type { Child } from 'vite-plugin-hyperapp/jsx/jsx-runtime'
+import type { Child } from 'hyperapp-jsx'
 
 function Panel({ title, children }: { title: string; children?: Child }) {
   return (
@@ -203,13 +211,12 @@ Server-side rendering is when the server sends your app's initial view already f
 See [Vite's SSR guide](https://vite.dev/guide/ssr) for setting up a server and
 client entry. 
 
-This plugin exports `renderToString` from
-`vite-plugin-hyperapp/ssr`. Import it in your server entry to render the
-initial view to an HTML string:
+The `hyperapp-ssr` package exports `renderToString`. Import it in your server
+entry to render the initial view to an HTML string:
 
 ```js
 // src/entry-server.js
-import { renderToString } from 'vite-plugin-hyperapp/ssr'
+import { renderToString } from 'hyperapp-ssr'
 import { init, view } from './app.jsx'
 
 //...
